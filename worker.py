@@ -1,9 +1,14 @@
 from __future__ import print_function
 import time
 import Pyro4
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
 
 HOST_IP = "192.168.0.32"    # Set to the server ip or url(if on AWS)
 HOST_PORT = 9092         # Set accordingly (i.e. 9876)
+
 
 @Pyro4.expose
 class ForestWorker(object):
@@ -53,3 +58,15 @@ class ForestWorker(object):
     @property
     def testLabels(self):
         return self.test_labels
+
+
+if __name__ == "__main__":
+    # Add the proper "host" and "port" arguments for the construction
+    # of the Daemon so it can be accessed remotely
+    with Pyro4.Daemon(host=HOST_IP, port=HOST_PORT) as daemon:
+        # register the class
+        worker_uri = daemon.register(ForestWorker)
+        with Pyro4.locateNS() as ns:
+            ns.register("forest.worker", worker_uri)
+        print("Forest worker available.")
+        daemon.requestLoop()
