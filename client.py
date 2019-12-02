@@ -5,11 +5,13 @@ import Pyro4
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
+import pickle
 
 # The two libraries below are just for the png creation of the tree
 from sklearn.tree import export_graphviz
 # import pydot
 
+Pyro4.config.SERIALIZERS_ACCEPTED = ["json", "marshal", "serpent", "pickle"]
 
 # !!!!This model needs work!!!!
 # I need to modify the data to predict NEXT weeks weather
@@ -55,13 +57,11 @@ Worker = Pyro4.Proxy(workers[0])   # get the remote object
 Worker.hello()
 
 # initialize the object with these values
-Worker.setFeatures(features)
-Worker.setLabels(labels)
-Worker.setTestFeatures(test_features)
-Worker.setTestLabels(test_labels)
+Worker.setFeatures(train_features.tolist())
+Worker.setLabels(train_labels.tolist())
+Worker.setTestFeatures(test_features.tolist())
+Worker.setTestLabels(test_labels.tolist())
 
-# Worker.forest()
-
-# worker = ForestWorker(features, labels, test_features, test_labels)
+Worker.forest()
 
 
