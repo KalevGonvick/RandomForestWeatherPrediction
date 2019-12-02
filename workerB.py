@@ -48,7 +48,6 @@ class ForestWorker(object):
 
     def setFeatures(self, features):
         self.train_features = np.asarray(features)
-        print(self.train_features)
 
     def setLabels(self, labels):
         self.train_labels = np.asarray(labels)
