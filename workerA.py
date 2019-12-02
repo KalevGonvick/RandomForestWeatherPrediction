@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 
 # TODO: THIS IS ALWAYS THE IP OR URL OF THE MACHINE YOUR SERVER RUNS ON
-HOST_IP = "192.168.0.32"    # Set to the server ip or url(if on AWS)
+HOST_IP = "192.168.0.30"    # Set to the server ip or url(if on AWS)
 HOST_PORT = 9092         # Set accordingly (i.e. 9876)
 
 # Pyro4.config.SERIALIZERS_ACCEPTED = []
