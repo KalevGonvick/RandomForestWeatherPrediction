@@ -3,27 +3,20 @@ import time
 import Pyro4
 import pandas as pd
 import numpy as np
+import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 
 # TODO: THIS IS ALWAYS THE IP OR URL OF THE MACHINE YOUR SERVER RUNS ON
-HOST_IP = "192.168.0.42"    # Set to the server ip or url(if on AWS)
+HOST_IP = "192.168.0.32"    # Set to the server ip or url(if on AWS)
 HOST_PORT = 9092         # Set accordingly (i.e. 9876)
 
+# Pyro4.config.SERIALIZERS_ACCEPTED = []
+Pyro4.config.SERIALIZERS_ACCEPTED = ["json", "marshal", "serpent", "pickle"]
 
 @Pyro4.expose
 class ForestWorker(object):
-    # def __init__(self, features, labels, test_features, test_labels):
-    #     self.train_features = features
-    #     self.train_labels = labels
-    #     self.test_features = test_features
-    #     self.test_labels = test_labels
-
-    # def __init__(self):
-    #     self.train_features = None
-    #     self.train_labels = None
-    #     self.test_features = None
-    #     self.test_labels = None
+    
     def __init__(self):
         pass
 
@@ -54,16 +47,17 @@ class ForestWorker(object):
         response = {'predictions': predictions, 'accuracy': accuracy}
 
     def setFeatures(self, features):
-        self.train_features = features
+        self.train_features = np.asarray(features)
+        print(self.train_features)
 
     def setLabels(self, labels):
-        self.train_labels = labels
+        self.train_labels = np.asarray(labels)
 
     def setTestFeatures(self, test_features):
-        self.test_features = test_features
+        self.test_features = np.asarray(test_features)
 
     def setTestLabels(self, test_labels):
-        self.test_labels = test_labels
+        self.test_labels = np.asarray(test_labels)
 
     @property
     def features(self):
