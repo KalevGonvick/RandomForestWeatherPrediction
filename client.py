@@ -44,24 +44,26 @@ workers = []
 
 with Pyro4.locateNS() as ns:
     for worker, uri in ns.list(prefix="forest.worker").items():
-        print("found market", worker)
-        print("uri: ", uri)
+        print("found worker: " + worker + " at " + uri)
         workers.append(uri)
 if not workers:
     raise ValueError("no workers found! (have you started the workers?)")
 
 print(workers)
 
-Worker = Pyro4.Proxy(workers[0])   # get the remote object
+Worker_1 = Pyro4.Proxy(workers[0])   # get the remote object
+Worker_2 = Pyro4.Proxy(workers[1])   # get the remote object
 
-Worker.hello()
+
+Worker_1.hello()
+Worker_2.hello()
 
 # initialize the object with these values
-Worker.setFeatures(train_features.tolist())
-Worker.setLabels(train_labels.tolist())
-Worker.setTestFeatures(test_features.tolist())
-Worker.setTestLabels(test_labels.tolist())
+Worker_1.setFeatures(train_features.tolist())
+Worker_1.setLabels(train_labels.tolist())
+Worker_1.setTestFeatures(test_features.tolist())
+Worker_1.setTestLabels(test_labels.tolist())
 
-Worker.forest()
+Worker_1.forest()
 
 

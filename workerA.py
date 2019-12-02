@@ -21,7 +21,7 @@ class ForestWorker(object):
         pass
 
     def hello(self):
-        print("Hello")
+        print("Hello from worker A")
 
     def forest(self):
         # our forest
@@ -83,6 +83,6 @@ if __name__ == "__main__":
         # register the class
         worker_uri = daemon.register(ForestWorker)
         with Pyro4.locateNS() as ns:
-            ns.register("forest.worker", worker_uri)
-        print("Forest worker available.")
+            ns.register("forest.worker.a", worker_uri)
+        print("Forest worker A available.")
         daemon.requestLoop()
