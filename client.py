@@ -50,17 +50,18 @@ if not workers:
 
 print(workers)
 
-ForestWorker = Pyro4.Proxy(workers[0])   # get the remote object
+Worker = Pyro4.Proxy(workers[0])   # get the remote object
+
+Worker.hello()
 
 # initialize the object with these values
-ForestWorker.setFeatures(features)
-ForestWorker.setLabels(labels)
-ForestWorker.setTestFeatures(test_features)
-ForestWorker.setTestLabels(test_labels)
+Worker.setFeatures(features)
+Worker.setLabels(labels)
+Worker.setTestFeatures(test_features)
+Worker.setTestLabels(test_labels)
 
-ForestWorker.forest()
+# Worker.forest()
 
 # worker = ForestWorker(features, labels, test_features, test_labels)
 
-response = worker.forest
 
