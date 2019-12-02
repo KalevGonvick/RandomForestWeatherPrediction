@@ -41,7 +41,7 @@ class ui(App):
             PARAMS = {'airport': airport, 'days': daysNum, 'date': currentDate}
 
             # send http request to server
-            r = requests.get("http://127.0.0.1:5000", PARAMS)
+            r = requests.get("http://127.0.0.1:5000" + "/getWeather", PARAMS)
             print(r.content)
             #read results from server
             #data = r.json()
