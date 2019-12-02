@@ -24,21 +24,43 @@ class ForestWorker(object):
         return "Hello from worker B"
 
     def forest(self):
+        features = self.features
+
+        # labels are the thing we are trying to predict
+        labels_1 = np.array(features['avg_temp_future'])
+        labels_2 = np.array(features['max_temp_future'])
+        labels_3 = np.array(features['min_temp_future'])
+        labels = np.column_stack((labels_1,
+                                  labels_2,
+                                  labels_3))
+
+        features = features.drop(['avg_temp_future',
+                                  'max_temp_future',
+                                  'min_temp_future'],
+                                 axis=1)
+
+
+        feature_list = list(features.columns)
+        features = np.array(features)
+        train_features, test_features, train_labels, test_labels = train_test_split(features,
+                                                                                    labels,
+                                                                                    test_size=0.25,
+                                                                                    random_state=42)
         # our forest
         rf = RandomForestRegressor(n_estimators=1000, random_state=42)
-        rf.fit(self.features, self.labels)
+        rf.fit(train_features, train_labels)
 
         # Use the forest's predict method on the test data
-        predictions = rf.predict(self.testFeatures)
+        predictions = rf.predict(test_features)
 
         # Calculate the absolute errors
-        errors = abs(predictions - self.testLabels)
+        errors = abs(predictions - test_labels)
 
         # Print out the mean absolute error (mae)
         print("Mean Abs Error: " + str(round(np.mean(errors), 2)))
 
         # Calculate mean absolute percentage error (MAPE)
-        mape = 100 * (errors / self.testLabels)
+        mape = 100 * (errors / test_labels)
 
         # Calculate and display accuracy
         accuracy = 100 - np.mean(mape)
@@ -46,34 +68,10 @@ class ForestWorker(object):
 
         response = {'predictions': predictions, 'accuracy': accuracy}
 
+
     def setFeatures(self, features):
-        self.train_features = np.asarray(features)
-
-    def setLabels(self, labels):
-        self.train_labels = np.asarray(labels)
-
-    def setTestFeatures(self, test_features):
-        self.test_features = np.asarray(test_features)
-
-    def setTestLabels(self, test_labels):
-        self.test_labels = np.asarray(test_labels)
-
-    @property
-    def features(self):
-        return self.train_features
-
-    @property
-    def labels(self):
-        return self.train_labels
-
-    @property
-    def testFeatures(self):
-        return self.test_features
-
-    @property
-    def testLabels(self):
-        return self.test_labels
-
+        self.features = pd.read_json(features, orient='records')
+        print(self.features)
 
 if __name__ == "__main__":
     # Add the proper "host" and "port" arguments for the construction
