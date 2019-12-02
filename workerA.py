@@ -72,7 +72,6 @@ class ForestWorker(object):
     def setFeatures(self, features):
 
         self.features = pd.read_json(features, orient='records')
-        print(self.features)
 
 
 if __name__ == "__main__":
