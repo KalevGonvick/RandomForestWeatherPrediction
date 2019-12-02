@@ -124,6 +124,8 @@ def scrape_station(cur_station):
     sorted_frame = new_frame.sort_values(by=['year', 'month', 'day'])
     sorted_frame = pandas.get_dummies(sorted_frame)
 
+    return sorted_frame
+
     # Push to DB
     ##################### PUSH TO DB HERE #####################
 
