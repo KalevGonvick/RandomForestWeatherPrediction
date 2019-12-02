@@ -10,15 +10,17 @@ import time
 import json
 import pandas
 
-# url and header for fake browser
-lookup_URL = 'https://api.weather.com/v1/location/{}:9:US/observations/historical.json'
-user_agent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'
-headers = {'User-Agent': user_agent}
+
 
 def scrape_station(cur_station):
 
-    current_date_station = datetime.date(datetime.now())
-    end_date_station = current_date_station
+    # url and header for fake browser
+    lookup_URL = 'https://api.weather.com/v1/location/{}:9:US/observations/historical.json'
+    user_agent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'
+    headers = {'User-Agent': user_agent}
+
+    current_date_station = datetime.date(datetime.now()) - timedelta(days=7)
+    end_date_station = current_date_station + timedelta(days=7)
     li = []
     while current_date_station != end_date_station:
 
@@ -80,16 +82,7 @@ def scrape_station(cur_station):
              'avg_wind_spd': [df['wspd'].mean()],
              'min_wind_spd': [df['wspd'].min()],
              'max_wind_spd': [df['wspd'].max()],
-             'mode_wind_dir': [df['wdir'].mode()[0]],
-             'avg_temp_future': [],
-             'max_temp_future': [],
-             'min_temp_future': [],
-             'avg_humidity_future': [],
-             'max_humidity_future': [],
-             'min_humidity_future': [],
-             'avg_pressure_future': [],
-             'max_pressure_future': [],
-             'min_pressure_future': [],
+             'mode_wind_dir': [df['wdir'].mode()[0]]
              }
 
         # create new data frame and explicitly set our column names + order
@@ -114,15 +107,6 @@ def scrape_station(cur_station):
                         'avg_wind_spd',
                         'mode_wind_dir',
                         'mode_sky_desc',
-                        'avg_temp_future',
-                        'max_temp_future',
-                        'min_temp_future',
-                        'avg_humidity_future',
-                        'max_humidity_future',
-                        'min_humidity_future',
-                        'avg_pressure_future',
-                        'max_pressure_future',
-                        'min_pressure_future'
                         ]
 
         # reindex the columns
@@ -140,15 +124,9 @@ def scrape_station(cur_station):
     sorted_frame = new_frame.sort_values(by=['year', 'month', 'day'])
     sorted_frame = pandas.get_dummies(sorted_frame)
 
+    return sorted_frame
+
     # Push to DB
     ##################### PUSH TO DB HERE #####################
 
-
-# For the purpose of this project, we are only scraping from KATL.
-# Scraping takes about (~15 mins / airport * ~15 mins / year)
-schedule.every().day.at("22:00").do(scrape_station('KATL'))
-
-while True:
-    schedule.run_pending()
-    time.sleep(5)
 
