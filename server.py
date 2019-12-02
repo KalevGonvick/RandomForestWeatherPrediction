@@ -22,27 +22,6 @@ def say_hello():
 def get_weather():
     features = pd.read_csv('KMIA.csv')
 
-    # # labels are the thing we are trying to predict
-    labels_1 = np.array(features['avg_temp_future'])
-    labels_2 = np.array(features['max_temp_future'])
-    labels_3 = np.array(features['min_temp_future'])
-    labels = np.column_stack((labels_1,
-                              labels_2,
-                              labels_3))
-
-    features = features.drop(['avg_temp_future',
-                              'max_temp_future',
-                              'min_temp_future'],
-                             axis=1)
-
-
-    feature_list = list(features.columns)
-    features = np.array(features)
-    train_features, test_features, train_labels, test_labels = train_test_split(features,
-                                                                                labels,
-                                                                                test_size=0.25,
-                                                                                random_state=42)
-
     workers = []
 
     with Pyro4.locateNS() as ns:
@@ -58,10 +37,8 @@ def get_weather():
         response = worker.hello()
         print(response)
         # initialize the object with these values
-        worker.setFeatures(train_features.tolist())
-        worker.setLabels(train_labels.tolist())
-        worker.setTestFeatures(test_features.tolist())
-        worker.setTestLabels(test_labels.tolist())
+        print(features)
+        worker.setFeatures(features.to_json())
 
         worker.forest()
 
