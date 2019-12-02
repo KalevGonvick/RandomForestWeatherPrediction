@@ -21,7 +21,7 @@ class ForestWorker(object):
         pass
 
     def hello(self):
-        print("Hello from worker B")
+        return "Hello from worker B"
 
     def forest(self):
         # our forest

@@ -40,32 +40,6 @@ train_features, test_features, train_labels, test_labels = train_test_split(feat
                                                                             test_size=0.25,
                                                                             random_state=42)
 
-# workers = []
-
-# with Pyro4.locateNS() as ns:
-#     for worker, uri in ns.list(prefix="forest.worker").items():
-#         print("found worker: " + worker + " at " + uri)
-#         workers.append(uri)
-# if not workers:
-#     raise ValueError("no workers found! (have you started the workers?)")
-
-# print(workers)
-
-# Worker_1 = Pyro4.Proxy(workers[0])   # get the remote object
-# Worker_2 = Pyro4.Proxy(workers[1])   # get the remote object
-
-
-# Worker_1.hello()
-# Worker_2.hello()
-
-# # initialize the object with these values
-# Worker_1.setFeatures(train_features.tolist())
-# Worker_1.setLabels(train_labels.tolist())
-# Worker_1.setTestFeatures(test_features.tolist())
-# Worker_1.setTestLabels(test_labels.tolist())
-
-# Worker_1.forest()
-
 workers = []
 
 with Pyro4.locateNS() as ns:
@@ -78,6 +52,14 @@ if not workers:
 print(workers)
 
 for worker in workers:
-	worker.hello()
+	response = worker.hello()
+	print(response)
+	# initialize the object with these values
+	worker.setFeatures(train_features.tolist())
+	worker.setLabels(train_labels.tolist())
+	worker.setTestFeatures(test_features.tolist())
+	worker.setTestLabels(test_labels.tolist())
+
+	worker.forest()
 
 
