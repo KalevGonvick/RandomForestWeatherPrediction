@@ -65,6 +65,8 @@ def get_weather():
 
         worker.forest()
 
+    return "ITS FUCKING COLD"
+
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
 
@@ -77,4 +79,4 @@ application.add_url_rule('/getWeather', 'weather', get_weather)
 if __name__ == "__main__":
     # Setting debug to True enables debug output. This line should be
     # removed before deploying a production app.
-    application.run(host='0.0.0.0')
+    application.run()
