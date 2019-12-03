@@ -208,6 +208,7 @@ def get_weather():
     #each worker is sent the date (from client)
 
     workers = []
+    # results = []
     with Pyro4.locateNS() as ns:
         for worker, uri in ns.list(prefix="forest.worker").items():
             print("found worker: " + worker + " at " + uri)
@@ -217,16 +218,22 @@ def get_weather():
 
     print(workers)
 
+
     for worker in workers:
+        # worker._pyroAsync()
         response = worker.hello()
         print(response)
+        # results.append(response)
         # initialize the object with these values
         print(features)
         worker.setFeatures(features.to_json())
         worker.setPredictionData(prediction_values.to_json())
 
         response = worker.forest()
+        # results.append(response)
         print(response)
+    # for result in results:
+    #     print(result.value)
     return "ITS FUCKING COLD"
 
 # EB looks for an 'application' callable by default.
