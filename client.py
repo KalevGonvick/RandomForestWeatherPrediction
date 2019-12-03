@@ -23,22 +23,21 @@ PORT = 5000
 
 ###### USER INTERFACE ########
 class ui(App):
-    Config.set('graphics', 'width', '600')
-    Config.set('graphics', 'height', '900')
+    Config.set('graphics', 'width', '500')
+    Config.set('graphics', 'height', '400')
     def predict(self, instance, *args):
 
         print("predict button was pressed, this was the inputted airport: ", self.airport_txt.text)
 
         # gather the inputted values
         airport = self.airport_txt.text
-        daysNum = self.days_txt.text
         currentDate = datetime.date(datetime.now())
 
-        if ((airport == "") | (daysNum =="")):
+        if ((airport == "")):
             print("User inputted null values, not sending to main server")
         else:
             # put the parameters together
-            PARAMS = {'airport': airport, 'days': daysNum, 'date': currentDate}
+            PARAMS = {'airport': airport, 'date': currentDate}
 
             # send http request to server
             r = requests.get("http://127.0.0.1:5000" + "/getWeather", PARAMS)
@@ -91,52 +90,21 @@ class ui(App):
         training_box = BoxLayout(orientation="vertical", spacing=20)
 
         #weather prediction section
-        weather_txt = Label(text="Get Weather Prediction", font_size=30)
+        weather_txt = Label(text="Get Weather Prediction", font_size=30, bold=False, size_hint=(1,.15))
         #input text areas
         layout = GridLayout(cols=2,spacing=20)
-        layout.add_widget(Label(text='AIRPORT CODE'))
-        self.airport_txt = TextInput(hint_text='Insert airport code here')
+        layout.add_widget(Label(text='AIRPORT CODE', font_size=25))
+        self.airport_txt = TextInput(hint_text='Insert airport code here', font_size=25)
         layout.add_widget(self.airport_txt)
 
-        layout.add_widget(Label(text='Number of Days'))
-        self.days_txt = TextInput(hint_text='Insert number of days here')
-        layout.add_widget(self.days_txt)
         #submit button
-        find_weather_btn = Button(text="Predict Weather", on_press=self.predict)
+        find_weather_btn = Button(text="Predict Weather", on_press=self.predict, font_size= 30, size_hint=(1,1.8))
         #add all elements to the weather box
         weather_box.add_widget(weather_txt)
         weather_box.add_widget(layout)
         weather_box.add_widget(find_weather_btn)
 
-
-        #model training section
-        training_txt = Label(text='Train model', font_size=30)
-        #input fields
-        layout2 = GridLayout(cols=2, spacing=20)
-        layout2.add_widget(Label(text='AIRPORT CODE'))
-        self.airport2_txt = TextInput(hint_text='Insert airport code here')
-        layout2.add_widget(self.airport2_txt)
-
-        #input start date
-        layout2.add_widget(Label(text='Start Date'))
-        self.startdate = TextInput(hint_text='Insert start date here (YYYY-MM-DD)')
-        layout2.add_widget(self.startdate)
-        #input end date
-        layout2.add_widget(Label(text='End Date'))
-        self.enddate = TextInput(hint_text='Insert end date here (YYYY-MM-DD)')
-        layout2.add_widget(self.enddate)
-
-        #submit button
-        train_btn = Button(text="Train Model", on_press=self.train)
-
-        # add all elements to the training box
-        training_box.add_widget(training_txt)
-        training_box.add_widget(layout2)
-        training_box.add_widget(train_btn)
-
-
         box.add_widget(weather_box)
-        box.add_widget(training_box)
         return box
 
 ui().run()

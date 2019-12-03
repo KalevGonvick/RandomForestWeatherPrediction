@@ -1,9 +1,10 @@
 from __future__ import print_function
-
+import requests
 import pymysql as pymysql
 from flask import Flask
 from flask import request
 import pandas as pd
+from datetime import datetime, timedelta
 import time
 import Pyro4
 import json
@@ -72,7 +73,7 @@ def scrape_station(cur_station):
                                  ).content
 
         json_data_load = json.loads(json_data)
-        df = pandas.DataFrame(json_data_load['observations'])
+        df = pd.DataFrame(json_data_load['observations'])
 
         # format filename
         out_file_name = '{}-{}-{}.json'.format(current_date_station.year,
@@ -82,7 +83,8 @@ def scrape_station(cur_station):
         print("Getting next weeks data for numpy labels")
         print("Summarizing Data for: " + out_file_name)
         # basic stat calculations for each day
-        d = {'year': [current_date_station.year],
+        d = {'id': 0,
+             'year': [current_date_station.year],
              'month': [current_date_station.month],
              'day': [current_date_station.day],
              'avg_temp': [df['temp'].mean()],
@@ -97,16 +99,31 @@ def scrape_station(cur_station):
              'avg_pressure': [df['pressure'].mean()],
              'max_pressure': [df['pressure'].max()],
              'min_pressure': [df['pressure'].min()],
-             'mode_sky_desc': [df['wx_phrase'].mode()[0]],
              'avg_wind_spd': [df['wspd'].mean()],
              'min_wind_spd': [df['wspd'].min()],
              'max_wind_spd': [df['wspd'].max()],
-             'mode_wind_dir': [df['wdir'].mode()[0]]
+             'mode_wind_dir': [df['wdir'].mode()[0]],
+             'mode_sky_desc_Cloudy': [0],
+             'mode_sky_desc_Drizzle Fog': [0],
+             'mode_sky_desc_Fair': [1],
+             'mode_sky_desc_Fair / Windy': [0],
+             'mode_sky_desc_Fog': [0],
+             'mode_sky_desc_Heavy Rain / Windy': [0],
+             'mode_sky_desc_Light Drizzle': [0],
+             'mode_sky_desc_Light Rain': [0],
+             'mode_sky_desc_Light Snow': [0],
+             'mode_sky_desc_Mostly Cloudy': [0],
+             'mode_sky_desc_Mostly Cloudy / Windy': [0],
+             'mode_sky_desc_Partly Cloudy': [0],
+             'mode_sky_desc_Rain': [0],
+             'mode_sky_desc_Smoke': [0],
+             'mode_sky_desc_Wintry Mix': [0]
              }
 
         # create new data frame and explicitly set our column names + order
-        new_df = pandas.DataFrame(d)
-        column_names = ['year',
+        new_df = pd.DataFrame(d)
+        column_names = ['id',
+                        'year',
                         'month',
                         'day',
                         'min_temp',
@@ -125,8 +142,21 @@ def scrape_station(cur_station):
                         'max_wind_spd',
                         'avg_wind_spd',
                         'mode_wind_dir',
-                        'mode_sky_desc',
-                        ]
+                        'mode_sky_desc_Cloudy',
+                        'mode_sky_desc_Drizzle Fog',
+                        'mode_sky_desc_Fair',
+                        'mode_sky_desc_Fair / Windy',
+                        'mode_sky_desc_Fog',
+                        'mode_sky_desc_Heavy Rain / Windy',
+                        'mode_sky_desc_Light Drizzle',
+                        'mode_sky_desc_Light Rain',
+                        'mode_sky_desc_Light Snow',
+                        'mode_sky_desc_Mostly Cloudy',
+                        'mode_sky_desc_Mostly Cloudy / Windy',
+                        'mode_sky_desc_Partly Cloudy',
+                        'mode_sky_desc_Rain',
+                        'mode_sky_desc_Smoke',
+                        'mode_sky_desc_Wintry Mix']
 
         # reindex the columns
         new_df = new_df.reindex(columns=column_names)
@@ -136,12 +166,12 @@ def scrape_station(cur_station):
         current_date_station += timedelta(days=1)
 
     # concat everything into one data frame
-    frame = pandas.concat(li, axis=0, ignore_index=True)
-    new_frame = pandas.DataFrame(frame)
+    frame = pd.concat(li, axis=0, ignore_index=True)
+    new_frame = pd.DataFrame(frame)
 
     # sort by year, month, day
     sorted_frame = new_frame.sort_values(by=['year', 'month', 'day'])
-    sorted_frame = pandas.get_dummies(sorted_frame)
+    sorted_frame = pd.get_dummies(sorted_frame)
 
     return sorted_frame
 
@@ -170,7 +200,7 @@ def get_weather():
                                           'mode_sky_desc_Partly Cloudy','mode_sky_desc_Rain','mode_sky_desc_Smoke',
                                           'mode_sky_desc_Wintry Mix'])
     
-    prediction_values = scrape_station('katl')
+    prediction_values = scrape_station('KATL')
 
 
     #each worker is blank, but has the code to train and predict
@@ -193,7 +223,7 @@ def get_weather():
         # initialize the object with these values
         print(features)
         worker.setFeatures(features.to_json())
-        worker.setPredictionData(features.to_json())
+        worker.setPredictionData(prediction_values.to_json())
 
         response = worker.forest()
         print(response)

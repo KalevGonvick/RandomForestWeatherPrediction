@@ -31,30 +31,42 @@ class ForestWorker(object):
         labels_1 = np.array(features['avg_temp_future'])
         labels_2 = np.array(features['max_temp_future'])
         labels_3 = np.array(features['min_temp_future'])
+        labels_4 = np.array(features['avg_humidity_future'])
+        labels_5 = np.array(features['max_humidity_future'])
+        labels_6 = np.array(features['min_humidity_future'])
+        labels_7 = np.array(features['avg_pressure_future'])
+        labels_8 = np.array(features['max_pressure_future'])
+        labels_9 = np.array(features['min_pressure_future'])
         labels = np.column_stack((labels_1,
                                   labels_2,
-                                  labels_3))
+                                  labels_3,
+                                  labels_4,
+                                  labels_5,
+                                  labels_6,
+                                  labels_7,
+                                  labels_8,
+                                  labels_9))
         print("Gathering features...")
         features = features.drop(['avg_temp_future',
                                   'max_temp_future',
-                                  'min_temp_future'],
+                                  'min_temp_future',
+                                  'avg_humidity_future',
+                                  'max_humidity_future',
+                                  'min_humidity_future',
+                                  'avg_pressure_future',
+                                  'max_pressure_future',
+                                  'min_pressure_future'],
                                  axis=1)
-
-
         feature_list = list(features.columns)
         features = np.array(features)
-        print("Created train and test subsets...")
         train_features, test_features, train_labels, test_labels = train_test_split(features,
                                                                                     labels,
                                                                                     test_size=0.25,
                                                                                     random_state=42)
-        print("Generating forest...")
         # our forest
         rf = RandomForestRegressor(n_estimators=1000, random_state=42)
-        print("Fitting data...")
         rf.fit(train_features, train_labels)
 
-        print("Gathering predictions")
         # Use the forest's predict method on the test data
         predictions = rf.predict(test_features)
 
@@ -69,7 +81,6 @@ class ForestWorker(object):
 
         # Calculate and display accuracy
         accuracy = 100 - np.mean(mape)
-
         print('Accuracy: ' + str(round(accuracy, 2)) + '%.')
 
         predictions_week = rf.predict(self.predictionData)
@@ -80,7 +91,7 @@ class ForestWorker(object):
                                                 predictions_week[0][3],
                                                 predictions_week[0][4],
                                                 predictions_week[0][5],
-                                                predictions_week[0][6], 
+                                                predictions_week[0][6],
                                                 predictions_week[0][7],
                                                 predictions_week[0][8]],
                                     'Day 2':   [predictions_week[1][0],
@@ -89,7 +100,7 @@ class ForestWorker(object):
                                                 predictions_week[1][3],
                                                 predictions_week[1][4],
                                                 predictions_week[1][5],
-                                                predictions_week[1][6], 
+                                                predictions_week[1][6],
                                                 predictions_week[1][7],
                                                 predictions_week[1][8]],
                                     'Day 3': [predictions_week[2][0],
@@ -98,7 +109,7 @@ class ForestWorker(object):
                                                 predictions_week[2][3],
                                                 predictions_week[2][4],
                                                 predictions_week[2][5],
-                                                predictions_week[2][6], 
+                                                predictions_week[2][6],
                                                 predictions_week[2][7],
                                                 predictions_week[2][8]],
                                     'Day 4': [predictions_week[3][0],
@@ -107,7 +118,7 @@ class ForestWorker(object):
                                                 predictions_week[3][3],
                                                 predictions_week[3][4],
                                                 predictions_week[3][5],
-                                                predictions_week[3][6], 
+                                                predictions_week[3][6],
                                                 predictions_week[3][7],
                                                 predictions_week[3][8]],
                                     'Day 5': [predictions_week[4][0],
@@ -116,7 +127,7 @@ class ForestWorker(object):
                                                 predictions_week[4][3],
                                                 predictions_week[4][4],
                                                 predictions_week[4][5],
-                                                predictions_week[4][6], 
+                                                predictions_week[4][6],
                                                 predictions_week[4][7],
                                                 predictions_week[4][8]],
                                     'Day 6': [predictions_week[5][0],
@@ -125,7 +136,7 @@ class ForestWorker(object):
                                                 predictions_week[5][3],
                                                 predictions_week[5][4],
                                                 predictions_week[5][5],
-                                                predictions_week[5][6], 
+                                                predictions_week[5][6],
                                                 predictions_week[5][7],
                                                 predictions_week[5][8]],
                                     'Day 7': [predictions_week[6][0],
@@ -134,7 +145,7 @@ class ForestWorker(object):
                                                 predictions_week[6][3],
                                                 predictions_week[6][4],
                                                 predictions_week[6][5],
-                                                predictions_week[6][6], 
+                                                predictions_week[6][6],
                                                 predictions_week[6][7],
                                                 predictions_week[6][8]]}, 'accuracy': accuracy}
         return response
@@ -142,6 +153,12 @@ class ForestWorker(object):
     def setFeatures(self, features):
         print("Received data from central server.")
         self.features = pd.read_json(features, orient='records')
+        print(self.features)
+
+    def setPredictionData(self, data):
+        print("Received predction data from central server.")
+        self.predictionData = pd.read_json(data, orient='records')
+        print(self.predictionData)
 
 if __name__ == "__main__":
     # Add the proper "host" and "port" arguments for the construction
