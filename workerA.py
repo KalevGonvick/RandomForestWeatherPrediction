@@ -21,11 +21,13 @@ class ForestWorker(object):
         pass
 
     def hello(self):
+        print("reached the hello function of worker A")
         return "Hello from worker A"
 
-    def forest(self):
+    def forest(self, features_in, predictions_in):
 
-        features = self.features
+        features = pd.read_json(features_in, orient='records')
+        predictionData = pd.read_json(predictions_in, orient='records')
         print("Creating labels...")
         # labels are the thing we are trying to predict
         labels_1 = np.array(features['avg_temp_future'])
@@ -83,7 +85,7 @@ class ForestWorker(object):
         accuracy = 100 - np.mean(mape)
         print('Accuracy: ' + str(round(accuracy, 2)) + '%.')
 
-        predictions_week = rf.predict(self.predictionData)
+        predictions_week = rf.predict(predictionData)
 
         response = {'predictions': {'Day 1' : [predictions_week[0][0],
                                                 predictions_week[0][1],
@@ -150,15 +152,6 @@ class ForestWorker(object):
                                                 predictions_week[6][8]]}, 'accuracy': accuracy}
         return response
 
-    def setFeatures(self, features):
-        print("Received data from central server.")
-        self.features = pd.read_json(features, orient='records')
-        print(self.features)
-
-    def setPredictionData(self, data):
-        print("Received predction data from central server.")
-        self.predictionData = pd.read_json(data, orient='records')
-        print(self.predictionData)
 
 if __name__ == "__main__":
     # Add the proper "host" and "port" arguments for the construction

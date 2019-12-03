@@ -208,7 +208,7 @@ def get_weather():
     #each worker is sent the date (from client)
 
     workers = []
-    # results = []
+    results = []
     with Pyro4.locateNS() as ns:
         for worker, uri in ns.list(prefix="forest.worker").items():
             print("found worker: " + worker + " at " + uri)
@@ -220,21 +220,105 @@ def get_weather():
 
 
     for worker in workers:
-        # worker._pyroAsync()
-        response = worker.hello()
-        print(response)
+
+        # response = worker.hello()
         # results.append(response)
         # initialize the object with these values
-        print(features)
-        worker.setFeatures(features.to_json())
-        worker.setPredictionData(prediction_values.to_json())
+        worker._pyroAsync()
+        response2 = worker.forest(features.to_json(), prediction_values.to_json())
+        results.append(response2)
+    return_object = {"Day 1": {"Min Temperature": 0,
+                               "Max Temperature": 0,
+                               "Avg Temperature": 0,
+                               "Min Humidity": 0,
+                               "Max Humidity": 0,
+                               "Avg Humidity": 0,
+                               "Min Pressure": 0,
+                               "Max Pressure": 0,
+                               "Avg Pressure": 0,
+                               },
+                     "Day 2": {"Min Temperature": 0,
+                               "Max Temperature": 0,
+                               "Avg Temperature": 0,
+                               "Min Humidity": 0,
+                               "Max Humidity": 0,
+                               "Avg Humidity": 0,
+                               "Min Pressure": 0,
+                               "Max Pressure": 0,
+                               "Avg Pressure": 0,
+                               },
+                     "Day 3": {"Min Temperature": 0,
+                               "Max Temperature": 0,
+                               "Avg Temperature": 0,
+                               "Min Humidity": 0,
+                               "Max Humidity": 0,
+                               "Avg Humidity": 0,
+                               "Min Pressure": 0,
+                               "Max Pressure": 0,
+                               "Avg Pressure": 0,
+                               },
+                     "Day 4": {"Min Temperature": 0,
+                               "Max Temperature": 0,
+                               "Avg Temperature": 0,
+                               "Min Humidity": 0,
+                               "Max Humidity": 0,
+                               "Avg Humidity": 0,
+                               "Min Pressure": 0,
+                               "Max Pressure": 0,
+                               "Avg Pressure": 0,
+                               },
+                     "Day 5": {"Min Temperature": 0,
+                               "Max Temperature": 0,
+                               "Avg Temperature": 0,
+                               "Min Humidity": 0,
+                               "Max Humidity": 0,
+                               "Avg Humidity": 0,
+                               "Min Pressure": 0,
+                               "Max Pressure": 0,
+                               "Avg Pressure": 0,
+                               },
+                     "Day 6": {"Min Temperature": 0,
+                               "Max Temperature": 0,
+                               "Avg Temperature": 0,
+                               "Min Humidity": 0,
+                               "Max Humidity": 0,
+                               "Avg Humidity": 0,
+                               "Min Pressure": 0,
+                               "Max Pressure": 0,
+                               "Avg Pressure": 0,
+                               },
+                     "Day 7": {"Min Temperature": 0,
+                               "Max Temperature": 0,
+                               "Avg Temperature": 0,
+                               "Min Humidity": 0,
+                               "Max Humidity": 0,
+                               "Avg Humidity": 0,
+                               "Min Pressure": 0,
+                               "Max Pressure": 0,
+                               "Avg Pressure": 0,
+                               }
+                     }
+    i = 1
+    while(i<8):
+        current_day = str(i)
+        return_object["Day " + current_day]["Min Temperature"] = results[0].value["predictions"]["Day " + current_day][
+            0]
+        return_object["Day " + current_day]["Max Temperature"] = results[0].value["predictions"]["Day " + current_day][
+            1]
+        return_object["Day " + current_day]["Avg Temperature"] = results[0].value["predictions"]["Day " + current_day][
+            2]
+        return_object["Day " + current_day]["Min Humidity"] = results[0].value["predictions"]["Day " + current_day][3]
+        return_object["Day " + current_day]["Max Humidity"] = results[0].value["predictions"]["Day " + current_day][4]
+        return_object["Day " + current_day]["Avg Humidity"] = results[0].value["predictions"]["Day " + current_day][5]
+        return_object["Day " + current_day]["Min Pressure"] = results[0].value["predictions"]["Day " + current_day][6]
+        return_object["Day " + current_day]["Max Pressure"] = results[0].value["predictions"]["Day " + current_day][7]
+        return_object["Day " + current_day]["Avg Pressure"] = results[0].value["predictions"]["Day " + current_day][8]
+        i = i + 1
 
-        response = worker.forest()
-        # results.append(response)
-        print(response)
-    # for result in results:
-    #     print(result.value)
-    return "ITS FUCKING COLD"
+    print("PRINTING FIRST PREDICTION")
+
+    print(return_object)
+    return return_object
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
