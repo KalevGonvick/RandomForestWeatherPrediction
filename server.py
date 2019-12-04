@@ -13,9 +13,7 @@ import sys
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
-# The two libraries below are just for the png creation of the tree
-from sklearn.tree import export_graphviz
-# import pydot
+
 
 #create connection to database holding scraped data
 connection = pymysql.connect(host='localhost',
@@ -221,8 +219,6 @@ def get_weather():
 
     for worker in workers:
 
-        # response = worker.hello()
-        # results.append(response)
         # initialize the object with these values
         worker._pyroAsync()
         response2 = worker.forest(features.to_json(), prediction_values.to_json())
@@ -314,8 +310,6 @@ def get_weather():
         return_object["Day " + current_day]["Max Pressure"] = results[0].value["predictions"]["Day " + current_day][7]
         return_object["Day " + current_day]["Avg Pressure"] = results[0].value["predictions"]["Day " + current_day][8]
         i = i + 1
-
-    print("PRINTING FIRST PREDICTION")
 
     print(return_object)
     return return_object

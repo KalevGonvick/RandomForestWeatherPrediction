@@ -11,7 +11,6 @@ from sklearn.ensemble import RandomForestRegressor
 HOST_IP = "192.168.0.30"    # Set to the server ip or url(if on AWS)
 HOST_PORT = 9092         # Set accordingly (i.e. 9876)
 
-# Pyro4.config.SERIALIZERS_ACCEPTED = []
 Pyro4.config.SERIALIZERS_ACCEPTED = ["json", "marshal", "serpent", "pickle"]
 
 @Pyro4.expose
@@ -20,10 +19,10 @@ class ForestWorker(object):
     def __init__(self):
         pass
 
-    def hello(self):
-        print("reached the hello function of worker A")
-        return "Hello from worker A"
-
+    # @param - (JSON)features_in - the previous data records
+    # @param - (JSON)predictions_in - the current data information and the values
+    #                                 we insert after the model is created.
+    # return - (JSON)response - the formatted weather predictions for next week
     def forest(self, features_in, predictions_in):
 
         features = pd.read_json(features_in, orient='records')

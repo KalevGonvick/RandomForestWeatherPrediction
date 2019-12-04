@@ -11,15 +11,18 @@ import json
 import pandas
 
 
-# Function to get the next week data
+# getnextweekdsdata
+# @param - (datetime)date - the input date to scrape from
+# @param - (String)cur_station - the station name to scrape from
+# return - (Array)* - The array of information we want
 def getnextweeksdata(date, cur_station):
 
-    # url and header for fake browser
+    # same URL headers and headers
     lookup_URL = 'https://api.weather.com/v1/location/{}:9:US/observations/historical.json'
     user_agent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'
     headers = {'User-Agent': user_agent}
 
-    # Format the lookup_URL for the current station
+    # Still have to format the data with leading 0's less than 10 values
     formatted_lookup_URL = lookup_URL.format(cur_station)
     start_total_date = str(date.year)
 
@@ -34,7 +37,7 @@ def getnextweeksdata(date, cur_station):
     else:
         start_total_date += str(date.day)
 
-    # Add the parameters to the URL
+    # Add the parameters to the URL, same API key as before
     params = {'apiKey': '6532d6454b8aa370768e63d6ba5a832e',
               'units': 'e',
               'startDate': start_total_date}
@@ -45,6 +48,7 @@ def getnextweeksdata(date, cur_station):
                              headers=headers
                              ).content
 
+# format and return the information
     json_data_load = json.loads(json_data)
     df = pandas.DataFrame(json_data_load['observations'])
     return [df['temp'].mean(),
@@ -69,6 +73,7 @@ def scrape_station(cur_station, current_date_station, end_date_station):
     user_agent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.3'
     headers = {'User-Agent': user_agent}
 
+    # list to hold all rows of information
     li = []
     while current_date_station != end_date_station:
 
@@ -103,7 +108,7 @@ def scrape_station(cur_station, current_date_station, end_date_station):
         json_data_load = json.loads(json_data)
         df = pandas.DataFrame(json_data_load['observations'])
 
-        # format filename
+        # row date format for printing
         out_file_name = '{}-{}-{}.json'.format(current_date_station.year,
                                                current_date_station.month,
                                                current_date_station.day)
@@ -195,7 +200,7 @@ def scrape_station(cur_station, current_date_station, end_date_station):
     sorted_frame = new_frame.sort_values(by=['year', 'month', 'day'])
     sorted_frame = pandas.get_dummies(sorted_frame)
 
-    # save to CSV
+    # save to CSV, the format will be the same as our database table
     sorted_frame.to_csv('./' + cur_station + '_csv/' + cur_station + '.csv')
 
 
@@ -208,6 +213,7 @@ for station in ['KATL']:
     end_date = datetime(year=2019, month=1, day=1)
     scrape_station(station, current_date, end_date)
 
+# Other aiport codes to scrape from
 # 'KSFO'
 # 'KPHL'
 # 'KORD'
